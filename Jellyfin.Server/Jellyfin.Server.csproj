@@ -8,7 +8,7 @@
   <PropertyGroup>
     <AssemblyName>jellyfin</AssemblyName>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ServerGarbageCollection>false</ServerGarbageCollection>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -61,6 +61,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\src\Jellyfin.Drawing\Jellyfin.Drawing.csproj" />
+    <ProjectReference Include="..\..\src\Jellyfin.Abstractions\Jellyfin.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\Jellyfin.CoreDefaults\Jellyfin.CoreDefaults.csproj" />
     <ProjectReference Include="..\Emby.Server.Implementations\Emby.Server.Implementations.csproj" />
     <ProjectReference Include="..\src\Jellyfin.Drawing.Skia\Jellyfin.Drawing.Skia.csproj" />
     <ProjectReference Include="..\src\Jellyfin.LiveTv\Jellyfin.LiveTv.csproj" />

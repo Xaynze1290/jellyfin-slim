@@ -1,0 +1,18 @@
+{
+  "settings": {
+    "documentationRules": {
+      "companyName": "jellyfin-slim",
+      "documentInternalElements": false,
+      "documentPrivateElements": false
+    },
+    "orderingRules": {
+      "usingDirectivesPlacement": "insideNamespace"
+    },
+    "layoutRules": {
+      "newlineAtEndOfFile": "allow"
+    },
+    "namingRules": {
+      "allowCommonHungarianPrefixes": true
+    }
+  }
+}

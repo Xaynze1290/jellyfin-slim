@@ -136,6 +136,47 @@ namespace Jellyfin.Server
             services.AddHostedService<LibraryChangedNotifier>();
             services.AddHostedService<UserDataChangeNotifier>();
             services.AddHostedService<RecordingNotifier>();
+
+            // Register the service override host
+            services.AddSingleton<Jellyfin.Abstractions.Services.IServiceOverrideHost, Jellyfin.CoreDefaults.Services.ServiceOverrideHost>();
+
+            // Register new pluggable services with their default implementations using factory for overrides
+            services.AddSingleton<Jellyfin.Abstractions.Services.ITranscoderService>(serviceProvider =>
+            {
+                var overrideHost = serviceProvider.GetRequiredService<Jellyfin.Abstractions.Services.IServiceOverrideHost>();
+                if (overrideHost.HasOverride<Jellyfin.Abstractions.Services.ITranscoderService>())
+                {
+                    return overrideHost.GetOverride<Jellyfin.Abstractions.Services.ITranscoderService>();
+                }
+                return ActivatorUtilities.CreateInstance<Jellyfin.CoreDefaults.Transcoding.TranscodeManager>(serviceProvider);
+            });
+            services.AddSingleton<Jellyfin.Abstractions.Services.ILibraryScannerService>(serviceProvider =>
+            {
+                var overrideHost = serviceProvider.GetRequiredService<Jellyfin.Abstractions.Services.IServiceOverrideHost>();
+                if (overrideHost.HasOverride<Jellyfin.Abstractions.Services.ILibraryScannerService>())
+                {
+                    return overrideHost.GetOverride<Jellyfin.Abstractions.Services.ILibraryScannerService>();
+                }
+                return ActivatorUtilities.CreateInstance<Jellyfin.CoreDefaults.LibraryScanning.LibraryManager>(serviceProvider);
+            });
+            services.AddSingleton<Jellyfin.Abstractions.Services.ICoreAuthenticationService>(serviceProvider =>
+            {
+                var overrideHost = serviceProvider.GetRequiredService<Jellyfin.Abstractions.Services.IServiceOverrideHost>();
+                if (overrideHost.HasOverride<Jellyfin.Abstractions.Services.ICoreAuthenticationService>())
+                {
+                    return overrideHost.GetOverride<Jellyfin.Abstractions.Services.ICoreAuthenticationService>();
+                }
+                return ActivatorUtilities.CreateInstance<Jellyfin.CoreDefaults.Authentication.DefaultAuthenticationProvider>(serviceProvider);
+            });
+            services.AddSingleton<Jellyfin.Abstractions.Services.ISessionTrackerService>(serviceProvider =>
+            {
+                var overrideHost = serviceProvider.GetRequiredService<Jellyfin.Abstractions.Services.IServiceOverrideHost>();
+                if (overrideHost.HasOverride<Jellyfin.Abstractions.Services.ISessionTrackerService>())
+                {
+                    return overrideHost.GetOverride<Jellyfin.Abstractions.Services.ISessionTrackerService>();
+                }
+                return ActivatorUtilities.CreateInstance<Jellyfin.CoreDefaults.SessionTracking.SessionManager>(serviceProvider);
+            });
         }
 
         /// <summary>
