@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!-- Output path for plugins is usually a specific 'plugins' directory structure -->
+    <OutputPath>../../bin/plugins/TestOverridePlugin/</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Reference the Jellyfin.Abstractions project -->
+    <ProjectReference Include="..\..\src\Jellyfin.Abstractions\Jellyfin.Abstractions.csproj" />
+    <!-- Reference MediaBrowser.Common for IPlugin -->
+    <ProjectReference Include="..\..\MediaBrowser.Common\MediaBrowser.Common.csproj" />
+    <!-- Reference MediaBrowser.Controller for IServerApplicationHost (if needed directly by plugin) -->
+    <ProjectReference Include="..\..\MediaBrowser.Controller\MediaBrowser.Controller.csproj" />
+     <!-- Reference Microsoft.Extensions.DependencyInjection.Abstractions for IServiceCollection (if needed) -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+  </ItemGroup>
+</Project>

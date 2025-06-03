@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable> <!-- This is a test project -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Moq" /> <!-- Adding Moq for mocking dependencies -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Reference the abstractions, core defaults, and the test plugin -->
+    <ProjectReference Include="..\..\src\Jellyfin.Abstractions\Jellyfin.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\Jellyfin.CoreDefaults\Jellyfin.CoreDefaults.csproj" />
+    <ProjectReference Include="..\..\plugins\TestOverridePlugin\TestOverridePlugin.csproj" />
+    <!-- Reference MediaBrowser.Controller for IServerApplicationHost if TestPlugin needs it -->
+    <ProjectReference Include="..\..\MediaBrowser.Controller\MediaBrowser.Controller.csproj" />
+  </ItemGroup>
+
+</Project>
