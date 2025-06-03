@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Jellyfin.Abstractions/Jellyfin.Abstractions.csproj" />
+    <ProjectReference Include="../../MediaBrowser.Common/MediaBrowser.Common.csproj" />
+    <ProjectReference Include="../../MediaBrowser.Controller/MediaBrowser.Controller.csproj" />
+    <ProjectReference Include="../../MediaBrowser.Model/MediaBrowser.Model.csproj" />
+    <ProjectReference Include="../../MediaBrowser.MediaEncoding/MediaBrowser.MediaEncoding.csproj" />
+    <ProjectReference Include="../../Jellyfin.Data/Jellyfin.Data.csproj" />
+    <ProjectReference Include="../../src/Jellyfin.Database/Jellyfin.Database.Implementations/Jellyfin.Database.Implementations.csproj" />
+    <ProjectReference Include="../../src/Jellyfin.Extensions/Jellyfin.Extensions.csproj" />
+    <!-- May need more depending on TranscodeManager's actual dependencies -->
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AsyncKeyedLock" /> <!-- Ensure version is compatible -->
+  </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="stylecop.json" />
+  </ItemGroup>
+</Project>

@@ -40,13 +40,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Episode = MediaBrowser.Controller.Entities.TV.Episode;
+using Jellyfin.Abstractions.Services; // Added for ISessionTrackerService
 
-namespace Emby.Server.Implementations.Session
+// Namespace and interface will be updated next
+namespace Jellyfin.CoreDefaults.SessionTracking // Changed namespace
 {
     /// <summary>
     /// Class SessionManager.
     /// </summary>
-    public sealed class SessionManager : ISessionManager, IAsyncDisposable
+    public sealed class SessionManager : ISessionManager, IAsyncDisposable, ISessionTrackerService // Added ISessionTrackerService
     {
         private readonly IUserDataManager _userDataManager;
         private readonly IServerConfigurationManager _config;
@@ -2139,6 +2141,108 @@ namespace Emby.Server.Implementations.Session
 
             _activeConnections.Clear();
             _activeLiveStreamSessions.Clear();
+        }
+
+        // Stub implementations for ISessionTrackerService
+        public async Task<CoreSessionInfo> CreateSessionAsync(CreateCoreSessionRequest request)
+        {
+            // This is a simplified adaptation. The existing LogSessionActivity is the closest,
+            // but it requires a User object and more details than provided in CreateCoreSessionRequest.
+            // A full implementation would need to resolve/load the User object first.
+            _logger.LogInformation("ISessionTrackerService.CreateSessionAsync called for user {UserId}, device {DeviceId}", request.UserId, request.DeviceId);
+
+            if (Guid.TryParse(request.UserId, out Guid userIdGuid))
+            {
+                var user = _userManager.GetUserById(userIdGuid);
+                if (user != null)
+                {
+                    // LogSessionActivity returns a concrete SessionInfo, need to map to CoreSessionInfo
+                    var concreteSession = await LogSessionActivity(
+                        request.ClientName,    // appName
+                        "0.0.0",               // appVersion (placeholder)
+                        request.DeviceId,
+                        request.DeviceName,
+                        "Unknown",             // remoteEndPoint (placeholder)
+                        user);
+
+                    return new CoreSessionInfo
+                    {
+                        Id = concreteSession.Id,
+                        UserId = concreteSession.UserId.ToString(),
+                        DeviceId = concreteSession.DeviceId,
+                        IsActive = concreteSession.IsActive,
+                        // additional properties can be mapped if needed
+                    };
+                }
+            }
+            // Fallback or throw if user not found or ID is invalid
+            _logger.LogWarning("User not found or invalid UserId for CreateSessionAsync: {UserId}", request.UserId);
+            throw new ArgumentException("User not found or invalid UserId for CreateSessionAsync.");
+        }
+
+        public Task<CoreSessionInfo?> GetSessionAsync(string sessionId)
+        {
+            var concreteSession = GetSession(sessionId, false); // throwOnMissing = false
+            if (concreteSession == null)
+            {
+                return Task.FromResult<CoreSessionInfo?>(null);
+            }
+
+            return Task.FromResult<CoreSessionInfo?>(new CoreSessionInfo {
+                Id = concreteSession.Id,
+                UserId = concreteSession.UserId.ToString(),
+                DeviceId = concreteSession.DeviceId,
+                IsActive = concreteSession.IsActive
+                // Map other properties as needed
+            });
+        }
+
+        public Task<IEnumerable<CoreSessionInfo>> GetUserSessionsAsync(string userId)
+        {
+            if (Guid.TryParse(userId, out Guid userGuid))
+            {
+                var userSessions = Sessions
+                    .Where(s => s.UserId == userGuid)
+                    .Select(s => new CoreSessionInfo {
+                        Id = s.Id,
+                        UserId = s.UserId.ToString(),
+                        DeviceId = s.DeviceId,
+                        IsActive = s.IsActive
+                        // Map other properties
+                    })
+                    .ToList();
+                return Task.FromResult<IEnumerable<CoreSessionInfo>>(userSessions);
+            }
+            return Task.FromResult<IEnumerable<CoreSessionInfo>>(new List<CoreSessionInfo>());
+        }
+
+        public Task EndSessionAsync(string sessionId)
+        {
+            // ReportSessionEnded is async (ValueTask), so await it.
+            return ReportSessionEnded(sessionId).AsTask();
+        }
+
+        public Task ReportSessionActivityAsync(string sessionId, bool isActive)
+        {
+            // The existing LogSessionActivity is more complex and updates LastActivityDate.
+            // This is a simplified interpretation. A more direct mapping might require
+            // finding the session and manually updating its LastActivityDate and IsActive state.
+            var session = GetSession(sessionId, false);
+            if (session != null)
+            {
+                session.LastActivityDate = DateTime.UtcNow;
+                // isActive might relate to session.IsActive or how PingTranscodingJob works.
+                // For now, just updating LastActivityDate.
+                 _logger.LogDebug("ReportSessionActivityAsync: Session {SessionId} activity reported. IsActive: {IsActive}", sessionId, isActive);
+
+                // Trigger general SessionActivity event
+                 EventHelper.QueueEventIfNotNull(
+                    SessionActivity,
+                    this,
+                    new SessionEventArgs { SessionInfo = session },
+                    _logger);
+            }
+            return Task.CompletedTask;
         }
     }
 }

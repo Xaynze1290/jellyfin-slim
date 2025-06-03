@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
@@ -19,6 +19,7 @@
     <ProjectReference Include="..\MediaBrowser.Common\MediaBrowser.Common.csproj" />
     <ProjectReference Include="..\MediaBrowser.Controller\MediaBrowser.Controller.csproj" />
     <ProjectReference Include="..\MediaBrowser.Model\MediaBrowser.Model.csproj" />
+    <!-- Removed ProjectReference to Jellyfin.CoreDefaults -->
   </ItemGroup>
 
   <ItemGroup>
